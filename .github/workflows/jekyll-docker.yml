@@ -1,4 +1,4 @@
-name: Jekyll site CI
+name: Jekyll Site CI
 
 on:
   push:
@@ -9,17 +9,32 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v4
 
-    - name: Build the site in the jekyll/builder container
+    # 1. Install Ruby (Native environment, NO Docker permission errors)
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3' 
+        bundler-cache: true # Uses your Gemfile to install Jekyll automatically
+
+    # 2. Inject Secret (Runner has full permission to create files)
+    - name: Create Secret Data File
       env:
-        ADMIN_PASS: ${{ secrets.ADMIN_PASSWORD }} 
+        ADMIN_PASS: ${{ secrets.ADMIN_PASSWORD }}
       run: |
-        # Create _data folder locally first to avoid permission issues
         mkdir -p _data
-        docker run \
-        -v ${{ github.workspace }}:/srv/jekyll \
-        -v ${{ github.workspace }}/_site:/srv/jekyll/_site \
-        -e ADMIN_PASS="$ADMIN_PASS" \
-        jekyll/builder:latest /bin/bash -c "echo 'password: $ADMIN_PASS' > /srv/jekyll/_data/secrets.yml && jekyll build"
+        echo "password: \"$ADMIN_PASS\"" > _data/secrets.yml
+        echo "✅ Secret injected successfully"
+
+    # 3. Build the Site
+    - name: Build with Jekyll
+      run: bundle exec jekyll build
+
+    # 4. (Optional) Archive the built site to download/view
+    - name: Upload Build Artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: "_site"
