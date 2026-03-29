@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lockdown Sentinel — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="icon" type="image/x-icon" href="icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #06080f;
+      --surface:   #0c1120;
+      --surface2:  #101828;
+      --border:    #1c2a45;
+      --border2:   #253859;
+      --accent:    #3d8bff;
+      --accent-glow: rgba(61,139,255,0.25);
+      --red:       #ff3a5c;
+      --red-glow:  rgba(255,58,92,0.22);
+      --green:     #22d67f;
+      --text:      #d0dbf4;
+      --muted:     #4e6080;
+      --muted2:    #8a9ab8;
+      --font-head: 'Orbitron', sans-serif;
+      --font-body: 'Barlow', sans-serif;
+      --font-cond: 'Barlow Condensed', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 400;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* ── AUTH OVERLAY ── */
+    #auth-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(6,8,15,0.97);
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 48px 40px;
+      width: 100%; max-width: 420px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(61,139,255,0.12), 0 20px 60px rgba(0,0,0,0.6);
+      position: relative; overflow: hidden;
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .auth-shield {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--accent-glow), transparent);
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 28px;
+    }
+
+    .auth-title {
+      font-family: var(--font-head);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .auth-sub {
+      font-size: 0.85rem;
+      color: var(--muted2);
+      margin-bottom: 32px;
+      font-family: var(--font-cond);
+      letter-spacing: 0.05em;
+    }
+
+    .auth-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 16px;
+      letter-spacing: 0.1em;
+    }
+
+    .auth-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .auth-btn {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      color: #fff;
+      font-family: var(--font-head);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .auth-btn:hover { background: #5a9fff; transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+    .auth-btn:active { transform: translateY(0); }
+
+    .auth-error {
+      color: var(--red);
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      margin-top: 14px;
+      display: none;
+    }
+
+    .auth-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 20px;
+      font-family: var(--font-cond);
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .auth-hint code {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    #main-app { display: none; position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      background: rgba(12,17,32,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent-glow), rgba(61,139,255,0.05));
+      border: 1.5px solid var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .nav-name {
+      font-family: var(--font-head);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    .nav-badge {
+      background: var(--red);
+      color: #fff;
+      font-family: var(--font-cond);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .nav-link {
+      color: var(--muted2);
+      text-decoration: none;
+      font-family: var(--font-cond);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover { color: var(--text); background: var(--surface2); }
+
+    .nav-link.active {
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid rgba(61,139,255,0.3);
+    }
+
+    .nav-logout {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--muted2);
+      font-family: var(--font-cond);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-left: 8px;
+    }
+
+    .nav-logout:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── HAMBURGER (mobile) ── */
+    .hamburger {
+      display: none;
+      flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--muted2); border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .mobile-menu {
+      display: none;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px 20px;
+      flex-direction: column; gap: 6px;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu .nav-link { width: 100%; }
+
+    /* ── PAGE CONTENT ── */
+    .page-header {
+      max-width: 1200px;
+      margin: 48px auto 0;
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+
+    .page-title-group h1 {
+      font-family: var(--font-head);
+      font-size: clamp(1.2rem, 3vw, 1.6rem);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    .page-title-group p {
+      font-family: var(--font-cond);
+      font-size: 0.9rem;
+      color: var(--muted2);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .status-indicator {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: var(--font-cond);
+      font-size: 0.82rem;
+      color: var(--green);
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      max-width: 1200px;
+      margin: 32px auto 0;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover { border-color: var(--border2); }
+
+    .stat-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .stat-card:hover::after { opacity: 1; }
+
+    .stat-label {
+      font-family: var(--font-cond);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .stat-value.green { color: var(--green); }
+    .stat-value.blue  { color: var(--accent); }
+    .stat-value.red   { color: var(--red); }
+
+    /* ── EDITOR SECTION ── */
+    .editor-section {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 24px 60px;
+    }
+
+    .editor-tabs {
+      display: flex; gap: 4px; margin-bottom: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .editor-tab {
+      background: none;
+      border: none; border-bottom: none;
+      color: var(--muted2);
+      font-family: var(--font-cond);
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 10px 22px 12px;
+      cursor: pointer;
+      position: relative;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .editor-tab::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0; height: 2px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform 0.2s;
+    }
+
+    .editor-tab.active { color: var(--accent); }
+    .editor-tab.active::after { transform: scaleX(1); }
+    .editor-tab:hover:not(.active) { color: var(--text); }
+
+    .editor-panel { display: none; }
+    .editor-panel.active { display: block; }
+
+    .editor-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+    }
+
+    .editor-toolbar {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    }
+
+    .toolbar-btn {
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: var(--muted2);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .toolbar-btn:hover {
+      background: var(--surface);
+      border-color: var(--border2);
+      color: var(--text);
+    }
+
+    .toolbar-sep {
+      width: 1px; height: 20px;
+      background: var(--border2);
+      margin: 0 4px;
+    }
+
+    .meta-row {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+
+    .meta-field {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-cond);
+      font-size: 0.82rem;
+      color: var(--muted2);
+    }
+
+    .meta-field label { color: var(--muted); }
+
+    .meta-input {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 5px 10px;
+      color: var(--text);
+      font-family: var(--font-cond);
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 180px;
+    }
+
+    .meta-input:focus { border-color: var(--accent); }
+
+    .editor-body {
+      padding: 20px;
+    }
+
+    .editor-textarea {
+      width: 100%;
+      min-height: 480px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 20px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .editor-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .editor-footer {
+      padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap; gap: 12px;
+    }
+
+    .char-count {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .btn-row { display: flex; gap: 10px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: none; border-radius: 8px;
+      font-family: var(--font-cond);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #5a9fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--muted2);
+    }
+
+    .btn-secondary:hover { color: var(--text); border-color: var(--text); }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--red);
+    }
+
+    .btn-danger:hover {
+      background: var(--red-glow);
+      border-color: var(--red);
+      box-shadow: 0 0 20px var(--red-glow);
+    }
+
+    /* ── PREVIEW ── */
+    .preview-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 32px;
+    }
+
+    .section-heading {
+      font-family: var(--font-cond);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .section-heading::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .preview-links {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+
+    .preview-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      text-decoration: none;
+      color: var(--muted2);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-family: var(--font-cond);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .preview-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 14px 22px;
+      display: flex; align-items: center; gap: 12px;
+      font-family: var(--font-cond);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    .toast-icon { font-size: 1.1rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      position: relative; z-index: 1;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+
+    .footer-brand {
+      font-family: var(--font-head);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .footer-meta {
+      display: flex; align-items: center; gap: 20px;
+      font-family: var(--font-cond);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .visitor-count {
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .visitor-dot {
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .auth-card { padding: 36px 24px; }
+      .editor-footer { flex-direction: column; align-items: stretch; }
+      .btn-row { flex-direction: column; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .editor-tabs { overflow-x: auto; }
+      .editor-tab { white-space: nowrap; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ AUTH OVERLAY ═══ -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-shield">🛡️</div>
+    <div class="auth-title">Sentinel Admin</div>
+    <div class="auth-sub">Restricted Access — Authorized Personnel Only</div>
+    <input
+      type="password"
+      id="auth-input"
+      class="auth-input"
+      placeholder="Enter access key"
+      autocomplete="current-password"
+    />
+    <button class="auth-btn" onclick="attemptLogin()">Authenticate</button>
+    <div class="auth-error" id="auth-error">⚠ Access denied. Invalid credentials.</div>
+    <div class="auth-hint">
+      Default key: <code>sentinel</code> — change via <code>ADMIN_PASSWORD</code> in source
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN APP ═══ -->
+<div id="main-app">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="/index" class="nav-brand">
+        <div class="nav-logo">🔒</div>
+        <span class="nav-name">Lockdown Sentinel</span>
+        <span class="nav-badge">Admin</span>
+      </a>
+      <div class="nav-links">
+        <a href="/index" class="nav-link active">Dashboard</a>
+        <a href="/tos" class="nav-link" target="_blank">TOS ↗</a>
+        <a href="/privacy" class="nav-link" target="_blank">Privacy ↗</a>
+        <button class="nav-logout" onclick="logout()">Log Out</button>
+      </div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/index" class="nav-link active">Dashboard</a>
+      <a href="/tos" class="nav-link" target="_blank">TOS ↗</a>
+      <a href="/privacy" class="nav-link" target="_blank">Privacy ↗</a>
+      <button class="nav-logout" onclick="logout()">Log Out</button>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-title-group">
+      <h1>Policy Manager</h1>
+      <p>Edit and publish Terms of Service &amp; Privacy Policy</p>
+    </div>
+    <div class="status-indicator">
+      <span class="status-dot"></span>
+      <span>Session Active</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Site Visitors</div>
+      <div class="stat-value blue" id="stat-visitors">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">TOS Version</div>
+      <div class="stat-value" id="stat-tos-ver">1.0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Privacy Version</div>
+      <div class="stat-value" id="stat-pp-ver">1.0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Last Updated</div>
+      <div class="stat-value green" id="stat-last-update" style="font-size:0.95rem">—</div>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="editor-section">
+    <div class="editor-tabs">
+      <button class="editor-tab active" onclick="switchTab('tos', this)">📋 Terms of Service</button>
+      <button class="editor-tab" onclick="switchTab('privacy', this)">🔐 Privacy Policy</button>
+    </div>
+
+    <!-- TOS PANEL -->
+    <div class="editor-panel active" id="panel-tos">
+      <div class="editor-card">
+        <div class="editor-toolbar">
+          <button class="toolbar-btn" onclick="insertMarkup('tos', '## ', '')">H2</button>
+          <button class="toolbar-btn" onclick="insertMarkup('tos', '### ', '')">H3</button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="insertMarkup('tos', '**', '**')"><b>B</b></button>
+          <button class="toolbar-btn" onclick="insertMarkup('tos', '_', '_')"><i>I</i></button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="insertMarkup('tos', '\n- ', '')">• List</button>
+          <button class="toolbar-btn" onclick="insertMarkup('tos', '\n---\n', '')">HR</button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="loadDefault('tos')">↺ Reset</button>
+        </div>
+        <div class="meta-row">
+          <div class="meta-field">
+            <label>Version</label>
+            <input type="text" class="meta-input" id="tos-version" placeholder="e.g. 1.2" style="min-width:100px;width:100px;" />
+          </div>
+          <div class="meta-field">
+            <label>Effective Date</label>
+            <input type="date" class="meta-input" id="tos-date" />
+          </div>
+        </div>
+        <div class="editor-body">
+          <textarea class="editor-textarea" id="tos-editor" oninput="updateCharCount('tos')" placeholder="Write your Terms of Service here…"></textarea>
+        </div>
+        <div class="editor-footer">
+          <span class="char-count" id="tos-chars">0 characters</span>
+          <div class="btn-row">
+            <button class="btn btn-danger" onclick="clearEditor('tos')">Clear</button>
+            <button class="btn btn-secondary" onclick="previewPage('tos')">Preview ↗</button>
+            <button class="btn btn-primary" onclick="savePolicy('tos')">💾 Save & Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRIVACY PANEL -->
+    <div class="editor-panel" id="panel-privacy">
+      <div class="editor-card">
+        <div class="editor-toolbar">
+          <button class="toolbar-btn" onclick="insertMarkup('privacy', '## ', '')">H2</button>
+          <button class="toolbar-btn" onclick="insertMarkup('privacy', '### ', '')">H3</button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="insertMarkup('privacy', '**', '**')"><b>B</b></button>
+          <button class="toolbar-btn" onclick="insertMarkup('privacy', '_', '_')"><i>I</i></button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="insertMarkup('privacy', '\n- ', '')">• List</button>
+          <button class="toolbar-btn" onclick="insertMarkup('privacy', '\n---\n', '')">HR</button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="loadDefault('privacy')">↺ Reset</button>
+        </div>
+        <div class="meta-row">
+          <div class="meta-field">
+            <label>Version</label>
+            <input type="text" class="meta-input" id="privacy-version" placeholder="e.g. 1.2" style="min-width:100px;width:100px;" />
+          </div>
+          <div class="meta-field">
+            <label>Effective Date</label>
+            <input type="date" class="meta-input" id="privacy-date" />
+          </div>
+        </div>
+        <div class="editor-body">
+          <textarea class="editor-textarea" id="privacy-editor" oninput="updateCharCount('privacy')" placeholder="Write your Privacy Policy here…"></textarea>
+        </div>
+        <div class="editor-footer">
+          <span class="char-count" id="privacy-chars">0 characters</span>
+          <div class="btn-row">
+            <button class="btn btn-danger" onclick="clearEditor('privacy')">Clear</button>
+            <button class="btn btn-secondary" onclick="previewPage('privacy')">Preview ↗</button>
+            <button class="btn btn-primary" onclick="savePolicy('privacy')">💾 Save & Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK LINKS -->
+  <div class="preview-section">
+    <div class="section-heading">Published Pages</div>
+    <div class="preview-links">
+      <a href="/tos" target="_blank" class="preview-link">📋 Terms of Service ↗</a>
+      <a href="/privacy" target="_blank" class="preview-link">🔐 Privacy Policy ↗</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">Lockdown Sentinel © 2025</div>
+      <div class="footer-meta">
+        <div class="visitor-count">
+          <span class="visitor-dot"></span>
+          <span id="footer-visitors">Loading visitors…</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /main-app -->
+
+<!-- TOAST -->
+<div id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-msg">Saved!</span></div>
+
+<script>
+  // ── CONFIG ──────────────────────────────────────────────
+  const ADMIN_PASSWORD = 'R;SK.RsqW.C!+]D}S084'; // ← Change this
+
+  const DEFAULT_TOS = `## 1. Acceptance of Terms
+
+By adding Lockdown Sentinel to your Discord server, inviting it to any server, or using any of its features, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you must not use the bot.
+
+## 2. Description of Service
+
+Lockdown Sentinel is a Discord moderation bot that provides server lockdown and access-control features, including:
+- Locking and unlocking channels, categories, or entire servers
+- Posting notices inside channels during lockdown events
+- Maintaining exempt role lists
+- Logging actions to a dedicated log channel
+- Auto-unlock timers and watchdog protection
+
+## 3. Eligibility
+
+You must be at least 13 years old (or the minimum age required in your country) to use Discord and this bot. By using Lockdown Sentinel, you confirm that you meet these requirements.
+
+## 4. Permitted Use
+
+You may use Lockdown Sentinel solely for lawful moderation of Discord servers where you have appropriate administrative authority. You are responsible for ensuring that your use complies with Discord's Terms of Service and Community Guidelines.
+
+## 5. Prohibited Activities
+
+You agree not to:
+- Use the bot to harass, abuse, or harm other users
+- Use the bot in violation of Discord's Terms of Service
+- Attempt to reverse-engineer, modify, or exploit the bot
+- Use the bot for any unlawful purpose
+- Attempt to overload, disrupt, or interfere with the bot's operation
+
+## 6. Permissions and Data
+
+Lockdown Sentinel requires the **Manage Channels**, **Send Messages**, and **Embed Links** permissions to function. The bot stores server configuration data (guild IDs, channel IDs, role IDs) locally to restore lockdown states after restarts. See our Privacy Policy for full details.
+
+## 7. Availability
+
+We strive to keep Lockdown Sentinel available at all times, but we do not guarantee uninterrupted service. The bot may be offline for maintenance, updates, or due to issues beyond our control.
+
+## 8. Disclaimer of Warranties
+
+Lockdown Sentinel is provided "as is" without any warranty of any kind. We disclaim all warranties, express or implied, including but not limited to merchantability, fitness for a particular purpose, and non-infringement.
+
+## 9. Limitation of Liability
+
+To the fullest extent permitted by law, the developers of Lockdown Sentinel shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the bot.
+
+## 10. Changes to Terms
+
+We reserve the right to modify these Terms of Service at any time. Continued use of Lockdown Sentinel after changes constitutes acceptance of the new terms. We will endeavor to notify users of significant changes via our Discord support server.
+
+## 11. Contact
+
+If you have questions about these Terms of Service, please reach out via our Discord support server.`;
+
+  const DEFAULT_PRIVACY = `## 1. Introduction
+
+This Privacy Policy explains how Lockdown Sentinel ("we," "us," or "our") collects, uses, and protects information when you use our Discord bot. We are committed to protecting your privacy and handling data responsibly.
+
+## 2. Information We Collect
+
+Lockdown Sentinel collects and stores only the minimum data required to function:
+
+- **Guild (Server) IDs** — to identify which server a lockdown applies to
+- **Channel IDs** — to track which channels have been locked and restore them after restarts
+- **Role IDs** — to manage exempt roles that bypass lockdowns
+- **Log Channel IDs** — to direct action logs to the correct channel
+- **Timestamp data** — to manage auto-unlock timers
+
+We do **not** collect message content, user IDs, usernames, email addresses, or any personally identifiable information.
+
+## 3. How We Use Your Data
+
+The data we collect is used exclusively to:
+- Apply and restore channel lockdown states across bot restarts
+- Manage auto-unlock timers
+- Send log messages to designated log channels
+- Maintain exempt role configurations
+
+## 4. Data Storage
+
+Configuration data is stored in a local JSON file on the server where the bot is hosted. This data is saved atomically (crash-safe) and is isolated per Discord guild.
+
+## 5. Data Retention
+
+Data is retained for as long as Lockdown Sentinel remains active in your server. If you remove the bot from your server, you may request deletion of your server's stored configuration by contacting us.
+
+## 6. Third-Party Services
+
+Lockdown Sentinel interacts with the **Discord API** as required for all Discord bots. Your use of Discord is governed by Discord's own Privacy Policy (https://discord.com/privacy) and Terms of Service. We do not share your data with any other third parties.
+
+## 7. Security
+
+We take reasonable technical precautions to protect stored data, including atomic file writes to prevent corruption. However, no system is perfectly secure, and we cannot guarantee absolute security.
+
+## 8. Children's Privacy
+
+Lockdown Sentinel is not directed at children under 13. We do not knowingly collect information from children under 13. If you believe we have inadvertently collected such data, please contact us immediately.
+
+## 9. Changes to This Policy
+
+We may update this Privacy Policy periodically. Continued use of the bot after changes constitutes acceptance of the updated policy. The effective date at the top of this page reflects when the latest version was published.
+
+## 10. Contact
+
+For privacy-related questions or data deletion requests, please contact us via our Discord support server.`;
+
+  // ── AUTH ─────────────────────────────────────────────────
+  function attemptLogin() {
+    const val = document.getElementById('auth-input').value;
+    if (val === ADMIN_PASSWORD) {
+      localStorage.setItem('sl_auth', btoa(ADMIN_PASSWORD + '_ok'));
+      document.getElementById('auth-overlay').style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+      initApp();
+    } else {
+      const err = document.getElementById('auth-error');
+      err.style.display = 'block';
+      document.getElementById('auth-input').style.borderColor = 'var(--red)';
+      setTimeout(() => { err.style.display = 'none'; document.getElementById('auth-input').style.borderColor = ''; }, 3000);
+    }
+  }
+
+  document.getElementById('auth-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') attemptLogin();
+  });
+
+  function logout() {
+    localStorage.removeItem('sl_auth');
+    location.reload();
+  }
+
+  // Check if already authenticated
+  const stored = localStorage.getItem('sl_auth');
+  if (stored === btoa(ADMIN_PASSWORD + '_ok')) {
+    document.getElementById('auth-overlay').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    initApp();
+  }
+
+  // ── APP INIT ─────────────────────────────────────────────
+  function initApp() {
+    loadEditors();
+    loadStats();
+    updateVisitorCount();
+  }
+
+  function loadEditors() {
+    // TOS
+    const tosData = JSON.parse(localStorage.getItem('sl_tos') || '{}');
+    document.getElementById('tos-editor').value = tosData.content || DEFAULT_TOS;
+    document.getElementById('tos-version').value = tosData.version || '1.0';
+    document.getElementById('tos-date').value = tosData.date || todayDate();
+    updateCharCount('tos');
+
+    // Privacy
+    const ppData = JSON.parse(localStorage.getItem('sl_privacy') || '{}');
+    document.getElementById('privacy-editor').value = ppData.content || DEFAULT_PRIVACY;
+    document.getElementById('privacy-version').value = ppData.version || '1.0';
+    document.getElementById('privacy-date').value = ppData.date || todayDate();
+    updateCharCount('privacy');
+  }
+
+  function loadStats() {
+    const tos = JSON.parse(localStorage.getItem('sl_tos') || '{}');
+    const pp  = JSON.parse(localStorage.getItem('sl_privacy') || '{}');
+    document.getElementById('stat-tos-ver').textContent = tos.version || '1.0';
+    document.getElementById('stat-pp-ver').textContent  = pp.version  || '1.0';
+
+    const dates = [tos.savedAt, pp.savedAt].filter(Boolean);
+    if (dates.length) {
+      const latest = new Date(Math.max(...dates.map(d => new Date(d))));
+      document.getElementById('stat-last-update').textContent = latest.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    }
+  }
+
+  function updateVisitorCount() {
+    const count = parseInt(localStorage.getItem('sl_visits') || '0');
+    document.getElementById('stat-visitors').textContent = count.toLocaleString();
+    document.getElementById('footer-visitors').textContent = count.toLocaleString() + ' visitors';
+  }
+
+  // ── EDITOR ───────────────────────────────────────────────
+  function switchTab(name, btn) {
+    document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.editor-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  function updateCharCount(name) {
+    const len = document.getElementById(name + '-editor').value.length;
+    document.getElementById(name + '-chars').textContent = len.toLocaleString() + ' characters';
+  }
+
+  function insertMarkup(name, pre, post) {
+    const ta = document.getElementById(name + '-editor');
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const sel = ta.value.substring(start, end);
+    ta.value = ta.value.substring(0, start) + pre + sel + post + ta.value.substring(end);
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = start + pre.length + sel.length + post.length;
+    updateCharCount(name);
+  }
+
+  function clearEditor(name) {
+    if (confirm('Clear the editor content? This cannot be undone unless you reset to default.')) {
+      document.getElementById(name + '-editor').value = '';
+      updateCharCount(name);
+    }
+  }
+
+  function loadDefault(name) {
+    if (confirm('Reset to default content? Your current edits will be lost.')) {
+      document.getElementById(name + '-editor').value = name === 'tos' ? DEFAULT_TOS : DEFAULT_PRIVACY;
+      updateCharCount(name);
+    }
+  }
+
+  function savePolicy(name) {
+    const content = document.getElementById(name + '-editor').value.trim();
+    const version = document.getElementById(name + '-version').value.trim() || '1.0';
+    const date    = document.getElementById(name + '-date').value || todayDate();
+    if (!content) { showToast('error', 'Content cannot be empty.'); return; }
+    const data = { content, version, date, savedAt: Date.now() };
+    localStorage.setItem('sl_' + name, JSON.stringify(data));
+    loadStats();
+    showToast('success', (name === 'tos' ? 'Terms of Service' : 'Privacy Policy') + ' saved successfully!');
+  }
+
+  function previewPage(name) {
+    window.open(name === 'tos' ? 'tos.html' : 'privacy.html', '_blank');
+  }
+
+  // ── UTILS ────────────────────────────────────────────────
+  function todayDate() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  let toastTimer;
+  function showToast(type, msg) {
+    const t = document.getElementById('toast');
+    const i = document.getElementById('toast-icon');
+    const m = document.getElementById('toast-msg');
+    i.textContent = type === 'success' ? '✓' : '⚠';
+    m.textContent = msg;
+    t.style.borderColor = type === 'success' ? 'var(--green)' : 'var(--red)';
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  function toggleMenu() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+  }
+</script>
+</body>
+</html>

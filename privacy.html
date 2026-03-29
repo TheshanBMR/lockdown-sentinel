@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Lockdown Sentinel</title>
+  <meta name="description" content="Privacy Policy for Lockdown Sentinel Discord moderation bot." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="icon" type="image/x-icon" href="icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #06080f;
+      --surface:   #0c1120;
+      --surface2:  #101828;
+      --border:    #1c2a45;
+      --border2:   #253859;
+      --accent:    #3d8bff;
+      --accent-glow: rgba(61,139,255,0.22);
+      --red:       #ff3a5c;
+      --green:     #22d67f;
+      --purple:    #9d6fff;
+      --text:      #d0dbf4;
+      --muted:     #4e6080;
+      --muted2:    #8a9ab8;
+      --font-head: 'Orbitron', sans-serif;
+      --font-body: 'Barlow', sans-serif;
+      --font-cond: 'Barlow Condensed', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 400;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: rgba(12,17,32,0.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logo {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--accent-glow), rgba(61,139,255,0.05));
+      border: 1.5px solid var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    .nav-name {
+      font-family: var(--font-head);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .nav-link {
+      color: var(--muted2);
+      text-decoration: none;
+      font-family: var(--font-cond);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover { color: var(--text); background: var(--surface2); }
+
+    .nav-link.active {
+      color: var(--accent);
+      background: var(--accent-glow);
+      border: 1px solid rgba(61,139,255,0.3);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--muted2); border-radius: 2px;
+    }
+
+    .mobile-menu {
+      display: none;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px 20px;
+      flex-direction: column; gap: 6px;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 24px 40px;
+      display: flex; align-items: flex-start; gap: 32px;
+    }
+
+    .hero-icon {
+      flex-shrink: 0;
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, rgba(157,111,255,0.2), rgba(157,111,255,0.05));
+      border: 1.5px solid rgba(157,111,255,0.5);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 0 40px rgba(157,111,255,0.12);
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-cond);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      color: var(--purple);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .hero-title {
+      font-family: var(--font-head);
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-transform: uppercase;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .hero-meta {
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-family: var(--font-cond);
+      font-size: 0.78rem;
+      color: var(--muted2);
+    }
+
+    .hero-badge .dot {
+      width: 5px; height: 5px;
+      background: var(--green);
+      border-radius: 50%;
+    }
+
+    /* ── DATA TABLE ── */
+    .data-summary {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 32px;
+      position: relative; z-index: 1;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .summary-label {
+      font-family: var(--font-cond);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      transition: border-color 0.2s;
+    }
+
+    .summary-card:hover { border-color: var(--border2); }
+
+    .summary-card-label {
+      font-family: var(--font-cond);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .summary-card-value {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .tag-yes {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(34,214,127,0.1);
+      border: 1px solid rgba(34,214,127,0.3);
+      color: var(--green);
+      border-radius: 4px;
+      font-family: var(--font-cond);
+      font-size: 0.72rem;
+      padding: 2px 8px;
+    }
+
+    .tag-no {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(255,58,92,0.08);
+      border: 1px solid rgba(255,58,92,0.25);
+      color: var(--red);
+      border-radius: 4px;
+      font-family: var(--font-cond);
+      font-size: 0.72rem;
+      padding: 2px 8px;
+    }
+
+    /* ── LAYOUT ── */
+    .layout {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 48px;
+      position: relative; z-index: 1;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky; top: 84px;
+    }
+
+    .toc-title {
+      font-family: var(--font-cond);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+
+    .toc-list a {
+      display: block;
+      color: var(--muted2);
+      text-decoration: none;
+      font-family: var(--font-cond);
+      font-size: 0.82rem;
+      padding: 5px 10px;
+      border-left: 2px solid transparent;
+      border-radius: 0 4px 4px 0;
+      transition: all 0.15s;
+    }
+
+    .toc-list a:hover {
+      color: var(--text);
+      border-left-color: var(--border2);
+      background: var(--surface2);
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .content-inner {
+      padding: 40px 48px;
+    }
+
+    .content-section {
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .content-section:last-child {
+      border-bottom: none; margin-bottom: 0; padding-bottom: 0;
+    }
+
+    .content-section h2 {
+      font-family: var(--font-cond);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .section-num {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 26px; height: 26px;
+      background: rgba(157,111,255,0.12);
+      border: 1px solid rgba(157,111,255,0.3);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--purple);
+      flex-shrink: 0;
+    }
+
+    .content-section h3 {
+      font-family: var(--font-cond);
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--muted2);
+      text-transform: uppercase;
+      margin: 20px 0 10px;
+    }
+
+    .content-section p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .content-section p:last-child { margin-bottom: 0; }
+
+    .content-section ul, .content-section ol {
+      padding-left: 20px; margin-bottom: 14px;
+    }
+
+    .content-section li {
+      font-size: 0.92rem; line-height: 1.7;
+      color: var(--text); margin-bottom: 6px; padding-left: 4px;
+    }
+
+    .content-section strong { color: var(--text); font-weight: 600; }
+
+    .content-section a { color: var(--accent); text-decoration: none; }
+    .content-section a:hover { text-decoration: underline; }
+
+    .content-section hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      position: relative; z-index: 1;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+
+    .footer-brand {
+      font-family: var(--font-head);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .footer-meta {
+      display: flex; align-items: center; gap: 20px;
+      font-family: var(--font-cond);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--muted2); }
+
+    .visitor-count { display: flex; align-items: center; gap: 6px; }
+
+    .visitor-dot {
+      width: 5px; height: 5px;
+      background: var(--green); border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.4; } }
+
+    .back-top {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--muted2); text-decoration: none;
+      font-family: var(--font-cond); font-size: 0.82rem;
+      padding: 8px 14px;
+      border: 1px solid var(--border); border-radius: 6px;
+      transition: all 0.2s; margin-top: 24px;
+    }
+
+    .back-top:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .hero { flex-direction: column; gap: 20px; padding: 40px 24px 32px; }
+      .hero-icon { width: 56px; height: 56px; font-size: 24px; }
+      .content-inner { padding: 28px 20px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/index" class="nav-brand">
+      <div class="nav-logo">🔒</div>
+      <span class="nav-name">Lockdown Sentinel</span>
+    </a>
+    <div class="nav-links">
+      <a href="/index" class="nav-link">Home</a>
+      <a href="/tos"     class="nav-link">Terms</a>
+      <a href="/privacy" class="nav-link active">Privacy</a>
+    </div>
+    <button class="hamburger" onclick="document.getElementById('mob').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mob">
+    <a href="/index" class="nav-link">Home</a>
+    <a href="/tos"     class="nav-link">Terms</a>
+    <a href="/privacy" class="nav-link active">Privacy</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-icon">🔐</div>
+  <div class="hero-text">
+    <div class="hero-eyebrow">Legal Document</div>
+    <div class="hero-title">Privacy<br>Policy</div>
+    <div class="hero-meta">
+      <span class="hero-badge"><span class="dot"></span><span id="pp-version-badge">Version 1.0</span></span>
+      <span class="hero-badge">Effective: <span id="pp-date-badge">—</span></span>
+      <span class="hero-badge">Lockdown Sentinel Bot</span>
+    </div>
+  </div>
+</div>
+
+<!-- DATA SUMMARY -->
+<div class="data-summary">
+  <div class="summary-label">At a Glance</div>
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-card-label">Personal Data</div>
+      <div class="summary-card-value"><span class="tag-no">✕ Not Collected</span></div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Message Content</div>
+      <div class="summary-card-value"><span class="tag-no">✕ Not Read</span></div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Server Config</div>
+      <div class="summary-card-value"><span class="tag-yes">✓ Stored Locally</span></div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Third-Party Sharing</div>
+      <div class="summary-card-value"><span class="tag-no">✕ None</span></div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Data Deletion</div>
+      <div class="summary-card-value"><span class="tag-yes">✓ On Request</span></div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-card-label">Sells User Data</div>
+      <div class="summary-card-value"><span class="tag-no">✕ Never</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list" id="toc-list"></ul>
+  </aside>
+
+  <!-- CONTENT -->
+  <main>
+    <div class="content">
+      <div class="content-inner" id="pp-content">
+        <div style="text-align:center;padding:60px 40px;color:var(--muted2);font-family:var(--font-cond);">Loading Privacy Policy…</div>
+      </div>
+    </div>
+    <a href="#" class="back-top">↑ Back to top</a>
+  </main>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Lockdown Sentinel © 2025</div>
+    <div class="footer-meta">
+      <div class="footer-links">
+        <a href="/tos">Terms</a>
+        <a href="/privacy">Privacy</a>
+      </div>
+      <div class="visitor-count">
+        <span class="visitor-dot"></span>
+        <span id="footer-visitors">—</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+
+  document.querySelector('.back-top').addEventListener('click', function (e) {
+    e.preventDefault(); // stops # from appearing
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    history.replaceState(null, '', location.pathname + location.search); // clears hash if any
+  });
+
+  (function () {
+  function scrollToTarget(hash) {
+    if (!hash || hash === "#") return;
+
+    const target = document.querySelector(hash);
+    if (!target) return;
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+
+  function cleanUrl() {
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
+  // Handle clicks on links like <a href="#section1">
+  document.addEventListener("click", function (e) {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+
+    const hash = link.getAttribute("href");
+    const target = document.querySelector(hash);
+    if (!target) return;
+
+    e.preventDefault();
+    scrollToTarget(hash);
+    setTimeout(cleanUrl, 50);
+  });
+
+  // Handle opening the page directly with a hash in the URL
+  window.addEventListener("load", function () {
+    if (location.hash) {
+      scrollToTarget(location.hash);
+      setTimeout(cleanUrl, 50);
+    }
+  });
+
+  // Handle back/forward or manual hash changes
+  window.addEventListener("hashchange", function () {
+    if (location.hash) {
+      scrollToTarget(location.hash);
+      setTimeout(cleanUrl, 50);
+    }
+  });
+  })();
+
+  const DEFAULT_PRIVACY = `## 1. Introduction
+
+This Privacy Policy explains how Lockdown Sentinel ("we," "us," or "our") collects, uses, and protects information when you use our Discord bot. We are committed to protecting your privacy and handling data responsibly.
+
+## 2. Information We Collect
+
+Lockdown Sentinel collects and stores only the minimum data required to function:
+
+- **Guild (Server) IDs** — to identify which server a lockdown applies to
+- **Channel IDs** — to track which channels have been locked and restore them after restarts
+- **Role IDs** — to manage exempt roles that bypass lockdowns
+- **Log Channel IDs** — to direct action logs to the correct channel
+- **Timestamp data** — to manage auto-unlock timers
+
+We do **not** collect message content, user IDs, usernames, email addresses, or any personally identifiable information.
+
+## 3. How We Use Your Data
+
+The data we collect is used exclusively to:
+- Apply and restore channel lockdown states across bot restarts
+- Manage auto-unlock timers
+- Send log messages to designated log channels
+- Maintain exempt role configurations
+
+## 4. Data Storage
+
+Configuration data is stored in a local JSON file on the server where the bot is hosted. This data is saved atomically (crash-safe) and is isolated per Discord guild.
+
+## 5. Data Retention
+
+Data is retained for as long as Lockdown Sentinel remains active in your server. If you remove the bot from your server, you may request deletion of your server's stored configuration by contacting us.
+
+## 6. Third-Party Services
+
+Lockdown Sentinel interacts with the **Discord API** as required for all Discord bots. Your use of Discord is governed by Discord's own Privacy Policy (https://discord.com/privacy) and Terms of Service. We do not share your data with any other third parties.
+
+## 7. Security
+
+We take reasonable technical precautions to protect stored data, including atomic file writes to prevent corruption. However, no system is perfectly secure, and we cannot guarantee absolute security.
+
+## 8. Children's Privacy
+
+Lockdown Sentinel is not directed at children under 13. We do not knowingly collect information from children under 13. If you believe we have inadvertently collected such data, please contact us immediately.
+
+## 9. Changes to This Policy
+
+We may update this Privacy Policy periodically. Continued use of the bot after changes constitutes acceptance of the updated policy. The effective date at the top of this page reflects when the latest version was published.
+
+## 10. Contact
+
+For privacy-related questions or data deletion requests, please contact us via our Discord support server.`;
+
+  function trackVisitor() {
+    const today = new Date().toDateString();
+    const last  = localStorage.getItem('sl_last_visit');
+    let count   = parseInt(localStorage.getItem('sl_visits') || '0');
+    if (last !== today) {
+      count++;
+      localStorage.setItem('sl_visits', count);
+      localStorage.setItem('sl_last_visit', today);
+    }
+    document.getElementById('footer-visitors').textContent = count.toLocaleString() + ' visitors';
+  }
+
+  function renderMarkdown(md) {
+    const sections = [];
+    const lines = md.split('\n');
+    let currentSection = null;
+
+    lines.forEach(line => {
+      const h2 = line.match(/^## (.+)/);
+      if (h2) {
+        currentSection = { title: h2[1], lines: [] };
+        sections.push(currentSection);
+      } else if (currentSection) {
+        currentSection.lines.push(line);
+      }
+    });
+
+    if (!sections.length) {
+      return `<div class="content-section"><p>${processInline(md.replace(/\n/g,'<br>'))}</p></div>`;
+    }
+
+    return sections.map((sec, i) => {
+      const num = i + 1;
+      const match = sec.title.match(/^\d+\.\s*(.+)/);
+      const cleanTitle = match ? match[1] : sec.title;
+      return `<div class="content-section" id="section-${num}">
+        <h2><span class="section-num">${String(num).padStart(2,'0')}</span>${cleanTitle}</h2>
+        ${processLines(sec.lines)}
+      </div>`;
+    }).join('');
+  }
+
+  function processLines(lines) {
+    let html = '';
+    let listBuf = [];
+
+    function flushList() {
+      if (listBuf.length) {
+        html += '<ul>' + listBuf.map(l => `<li>${processInline(l)}</li>`).join('') + '</ul>';
+        listBuf = [];
+      }
+    }
+
+    lines.forEach(line => {
+      if (/^---+$/.test(line.trim())) { flushList(); html += '<hr>'; return; }
+      const li = line.match(/^[-*]\s+(.+)/);
+      if (li) { listBuf.push(li[1]); return; }
+      flushList();
+      const h3 = line.match(/^###\s+(.+)/);
+      if (h3) { html += `<h3>${processInline(h3[1])}</h3>`; return; }
+      if (line.trim() === '') return;
+      html += `<p>${processInline(line)}</p>`;
+    });
+    flushList();
+    return html;
+  }
+
+  function processInline(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/_(.+?)_/g, '<em>$1</em>')
+      .replace(/`(.+?)`/g, '<code style="background:var(--surface2);border:1px solid var(--border2);padding:1px 6px;border-radius:4px;font-family:var(--font-mono);font-size:0.85em;">$1</code>')
+      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>');
+  }
+
+  function buildTOC(sections) {
+    const toc = document.getElementById('toc-list');
+    toc.innerHTML = sections.map((sec, i) => {
+      const num = i + 1;
+      const match = sec.match(/^\d+\.\s*(.+)/);
+      const label = match ? match[1] : sec;
+      return `<li><a href="#section-${num}">${num}. ${label}</a></li>`;
+    }).join('');
+  }
+
+  function loadPrivacy() {
+    const data = JSON.parse(localStorage.getItem('sl_privacy') || '{}');
+    const content = data.content || DEFAULT_PRIVACY;
+    const version = data.version || '1.0';
+    const date    = data.date    || null;
+
+    document.getElementById('pp-version-badge').textContent = 'Version ' + version;
+    const d = date ? new Date(date) : new Date();
+    document.getElementById('pp-date-badge').textContent = d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+
+    document.getElementById('pp-content').innerHTML = renderMarkdown(content);
+
+    const secs = (content.match(/^## .+/gm) || []).map(h => h.replace(/^## /, ''));
+    buildTOC(secs);
+  }
+
+  loadPrivacy();
+  trackVisitor();
+</script>
+</body>
+</html>
